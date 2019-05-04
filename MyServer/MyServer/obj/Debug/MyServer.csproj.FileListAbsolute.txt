@@ -1,0 +1,8 @@
+G:\UnityDocuments\GoldenFraud\MyServer\MyServer\bin\Debug\MyServer.dll
+G:\UnityDocuments\GoldenFraud\MyServer\MyServer\bin\Debug\MyServer.pdb
+G:\UnityDocuments\GoldenFraud\MyServer\MyServer\obj\Debug\MyServer.csprojAssemblyReference.cache
+G:\UnityDocuments\GoldenFraud\MyServer\MyServer\obj\Debug\MyServer.csproj.CoreCompileInputs.cache
+G:\UnityDocuments\GoldenFraud\MyServer\MyServer\obj\Debug\MyServer.dll
+G:\UnityDocuments\GoldenFraud\MyServer\MyServer\obj\Debug\MyServer.pdb
+G:\UnityDocuments\GoldenFraud\MyServer\MyServer\obj\Debug\MyServer.Properties.Resources.resources
+G:\UnityDocuments\GoldenFraud\MyServer\MyServer\obj\Debug\MyServer.csproj.GenerateResource.cache

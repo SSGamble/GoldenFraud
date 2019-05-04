@@ -1,0 +1,14 @@
+G:\UnityDocuments\GoldenFraud\MyServer\GameServer\obj\Debug\GameServer.csprojAssemblyReference.cache
+G:\UnityDocuments\GoldenFraud\MyServer\GameServer\obj\Debug\GameServer.csproj.CoreCompileInputs.cache
+G:\UnityDocuments\GoldenFraud\MyServer\GameServer\bin\Debug\GameServer.exe.config
+G:\UnityDocuments\GoldenFraud\MyServer\GameServer\bin\Debug\GameServer.exe
+G:\UnityDocuments\GoldenFraud\MyServer\GameServer\bin\Debug\GameServer.pdb
+G:\UnityDocuments\GoldenFraud\MyServer\GameServer\bin\Debug\MyServer.dll
+G:\UnityDocuments\GoldenFraud\MyServer\GameServer\bin\Debug\Protocol.dll
+G:\UnityDocuments\GoldenFraud\MyServer\GameServer\bin\Debug\MyServer.pdb
+G:\UnityDocuments\GoldenFraud\MyServer\GameServer\bin\Debug\Protocol.pdb
+G:\UnityDocuments\GoldenFraud\MyServer\GameServer\obj\Debug\GameServer.csproj.CopyComplete
+G:\UnityDocuments\GoldenFraud\MyServer\GameServer\obj\Debug\GameServer.exe
+G:\UnityDocuments\GoldenFraud\MyServer\GameServer\obj\Debug\GameServer.pdb
+G:\UnityDocuments\GoldenFraud\MyServer\GameServer\bin\Debug\MySql.Data.dll
+G:\UnityDocuments\GoldenFraud\MyServer\GameServer\bin\Debug\MySql.Data.xml
