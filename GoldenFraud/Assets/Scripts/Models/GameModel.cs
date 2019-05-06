@@ -20,5 +20,9 @@ public class GameModel {
     /// 顶注
     /// </summary>
     public int TopStakes { get; set; }
+    /// <summary>
+    /// 房间类型
+    /// </summary>
+    public RoomType RoomType { get; set; }
 
 }

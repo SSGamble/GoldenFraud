@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
 using System;
+using UnityEngine.SceneManagement;
 
 /// <summary>
 /// 游戏类型：单机/联网
@@ -58,10 +59,28 @@ public class RoomChoosePanel : MonoBehaviour {
         Models.GameModel.BottomStakes = bottomStakes;
         Models.GameModel.TopStakes = topStakes;
 
-        switch (gameType) {
-            case GameType.Online:
+        switch (bottomStakes) {
+            case 10:
+                Models.GameModel.RoomType = RoomType.Room10;
                 break;
+            case 20:
+                Models.GameModel.RoomType = RoomType.Room20;
+                break;
+            case 50:
+                Models.GameModel.RoomType = RoomType.Room50;
+                break;
+            default:
+                break;
+        }
+
+        switch (gameType) {
             case GameType.Stand:
+                // 进入单机游戏场景
+                SceneManager.LoadScene("03 - Stand");
+                break;
+            case GameType.Online:
+                // 进入联网游戏场景
+                SceneManager.LoadScene("04 - Online");
                 break;
             default:
                 break;

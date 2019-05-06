@@ -27,4 +27,20 @@ public class ResourcesManager {
             return sprite; // 返回头像
         }
     }
+
+    /// <summary>
+    /// 加载牌的图片
+    /// </summary>
+    /// <param name="cardName"></param>
+    /// <returns></returns>
+    public static Sprite LoadCardSprite(string cardName) {
+        if (nameSpriteDic.ContainsKey(cardName)) { // 如果字典里已经存在，就直接拿出来
+            return nameSpriteDic[cardName];
+        }
+        else {
+            Sprite sprite = Resources.Load<Sprite>("Poke/" + cardName); 
+            nameSpriteDic.Add(cardName, sprite);
+            return sprite; 
+        }
+    }
 }

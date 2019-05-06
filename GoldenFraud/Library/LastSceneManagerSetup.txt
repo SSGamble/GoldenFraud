@@ -1,4 +1,4 @@
 sceneSetups:
-- path: Assets/Scenes/03 - Stand.unity
+- path: Assets/Scenes/04 - Online.unity
   isLoaded: 1
   isActive: 1

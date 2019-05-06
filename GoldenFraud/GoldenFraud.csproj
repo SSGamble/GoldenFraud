@@ -221,6 +221,27 @@
     <Reference Include="UnityEngine.SpatialTracking">
       <HintPath>D:/Unity/2017.3.1p4/Editor/Data/UnityExtensions/Unity/UnitySpatialTracking/RuntimeEditor/UnityEngine.SpatialTracking.dll</HintPath>
     </Reference>
+    <Reference Include="DemiLib">
+      <HintPath>Assets/Demigiant/DemiLib/DemiLib.dll</HintPath>
+    </Reference>
+    <Reference Include="DOTween">
+      <HintPath>Assets/Demigiant/DOTween/DOTween.dll</HintPath>
+    </Reference>
+    <Reference Include="DOTween43">
+      <HintPath>Assets/Demigiant/DOTween/DOTween43.dll</HintPath>
+    </Reference>
+    <Reference Include="DOTween46">
+      <HintPath>Assets/Demigiant/DOTween/DOTween46.dll</HintPath>
+    </Reference>
+    <Reference Include="DOTween50">
+      <HintPath>Assets/Demigiant/DOTween/DOTween50.dll</HintPath>
+    </Reference>
+    <Reference Include="DOTweenPro">
+      <HintPath>Assets/Demigiant/DOTweenPro/DOTweenPro.dll</HintPath>
+    </Reference>
+    <Reference Include="Protocol">
+      <HintPath>Assets/Scripts/Net/Dll/Protocol.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine.Advertisements">
       <HintPath>C:/ProgramData/Unity/cache/packages/packages.unity.com/com.unity.ads@2.0.3/UnityEngine.Advertisements.dll</HintPath>
     </Reference>
@@ -233,35 +254,28 @@
     <Reference Include="UnityEngine.StandardEvents">
       <HintPath>C:/ProgramData/Unity/cache/packages/packages.unity.com/com.unity.standardevents@1.0.10/UnityEngine.StandardEvents.dll</HintPath>
     </Reference>
-    <Reference Include="DOTween43">
-      <HintPath>Assets/Demigiant/DOTween/DOTween43.dll</HintPath>
-    </Reference>
-    <Reference Include="DemiLib">
-      <HintPath>Assets/Demigiant/DemiLib/DemiLib.dll</HintPath>
-    </Reference>
-    <Reference Include="DOTween50">
-      <HintPath>Assets/Demigiant/DOTween/DOTween50.dll</HintPath>
-    </Reference>
-    <Reference Include="DOTween">
-      <HintPath>Assets/Demigiant/DOTween/DOTween.dll</HintPath>
-    </Reference>
-    <Reference Include="DOTweenPro">
-      <HintPath>Assets/Demigiant/DOTweenPro/DOTweenPro.dll</HintPath>
-    </Reference>
-    <Reference Include="DOTween46">
-      <HintPath>Assets/Demigiant/DOTween/DOTween46.dll</HintPath>
-    </Reference>
-    <Reference Include="Protocol">
-      <HintPath>Assets/Scripts/Net/Dll/Protocol.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Demigiant\DOTweenPro\DOTweenAnimation.cs" />
     <Compile Include="Assets\Scripts\Common\CallBack.cs" />
+    <Compile Include="Assets\Scripts\Common\Card.cs" />
+    <Compile Include="Assets\Scripts\Common\CardType.cs" />
     <Compile Include="Assets\Scripts\Common\EventCenter.cs" />
     <Compile Include="Assets\Scripts\Common\EventType.cs" />
     <Compile Include="Assets\Scripts\Common\ResourcesManager.cs" />
+    <Compile Include="Assets\Scripts\Common\RoomType.cs" />
+    <Compile Include="Assets\Scripts\Game\Online\GameManagerOnline.cs" />
+    <Compile Include="Assets\Scripts\Game\Online\LeftManagerOnline.cs" />
+    <Compile Include="Assets\Scripts\Game\Online\RightManagerOnline.cs" />
+    <Compile Include="Assets\Scripts\Game\Online\SelfManagerOnlint.cs" />
+    <Compile Include="Assets\Scripts\Game\Stand\AutoManagerStand.cs" />
+    <Compile Include="Assets\Scripts\Game\Stand\BaseManagerStand.cs" />
+    <Compile Include="Assets\Scripts\Game\Stand\GameManagerStand.cs" />
+    <Compile Include="Assets\Scripts\Game\Stand\GameOverPanel.cs" />
+    <Compile Include="Assets\Scripts\Game\Stand\LeftManagerStand.cs" />
+    <Compile Include="Assets\Scripts\Game\Stand\RightManagerStand.cs" />
     <Compile Include="Assets\Scripts\Game\Stand\SelfManagerStand.cs" />
+    <Compile Include="Assets\Scripts\Game\Stand\VSPanel_Stand.cs" />
     <Compile Include="Assets\Scripts\Models\GameModel.cs" />
     <Compile Include="Assets\Scripts\Models\Models.cs" />
     <Compile Include="Assets\Scripts\Net\ClientPeer.cs" />
@@ -274,6 +288,7 @@
     <Compile Include="Assets\Scripts\Net\NetMsg.cs" />
     <Compile Include="Assets\Scripts\Net\NetMsgCenter.cs" />
     <Compile Include="Assets\Scripts\UI\Hint.cs" />
+    <Compile Include="Assets\Scripts\UI\StakesHint.cs" />
     <Compile Include="Assets\Scripts\UIPanel\BankPanel.cs" />
     <Compile Include="Assets\Scripts\UIPanel\LoginPanel.cs" />
     <Compile Include="Assets\Scripts\UIPanel\MainPanel.cs" />

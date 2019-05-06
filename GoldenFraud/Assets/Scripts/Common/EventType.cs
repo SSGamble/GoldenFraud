@@ -10,5 +10,8 @@ public enum EventType
     SendRankListDto,
     ShowBankPanel,
     UpdateCoin,
-    ShowRoomChoosePanel
+    ShowRoomChoosePanel,
+    VSAI,
+    VSWithSelf,
+    GameOver
 }

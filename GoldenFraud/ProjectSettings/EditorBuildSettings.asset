@@ -11,3 +11,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/02 - Main.unity
     guid: f93adcbfeae1b924199e01c45920de4f
+  - enabled: 1
+    path: Assets/Scenes/03 - Stand.unity
+    guid: 41b24c3aa6df4e64eabd287b2ef359e6
+  - enabled: 1
+    path: Assets/Scenes/04 - Online.unity
+    guid: e45a43e83764b554e8b89da73037fc85
