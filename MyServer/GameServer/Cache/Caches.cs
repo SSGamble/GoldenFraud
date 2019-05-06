@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GameServer.Cache.Fight;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,12 +14,17 @@ namespace GameServer.Cache {
 
         // 因为有 3 种类型的房间，所有给 3 个数据缓存
         public static List<MatchCache> matchCacheList { get; set; }
+        /// <summary>
+        /// 战斗缓存
+        /// </summary>
+        public static FightCache FightCache { get; set; }
 
         static Caches() {
             matchCacheList = new List<MatchCache>();
             for (int i = 0; i < 3; i++) {
                 matchCacheList.Add(new MatchCache());
             }
+            FightCache = new FightCache();
         }
     }
 }

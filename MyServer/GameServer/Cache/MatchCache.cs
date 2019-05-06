@@ -54,6 +54,7 @@ namespace GameServer.Cache {
             else {
                 room = new MatchRoom(roomId.AddGet()); // 防止 id 重复
             }
+            room.Enter(client);
             roomIdModelDic.Add(room.roomId, room);
             userIdRoomIdDic.Add(client.Id, room.roomId);
             return room;

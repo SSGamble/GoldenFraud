@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
+using Protocol.Code;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -15,11 +16,12 @@ public class SelfManagerOnlint : MonoBehaviour {
     protected Text txtCountDown;
     protected Transform cardPoint;
     private GameObject goBottomButton;
-    private GameObject goTxtGiveUp;
+    private Text txtHint;
     private GameObject goCompareBtns;
     private Text txtName;
     private Text txtCoin;
     private Button btnReady;
+    private Button btnUnReady;
     private Button btnLookCard;
     private Button btnFollowStakes;
     private Button btnGiveUp;
@@ -39,7 +41,14 @@ public class SelfManagerOnlint : MonoBehaviour {
     protected float timer = 0.0f; // 计时器
 
     private void Awake() {
+        EventCenter.AddListener(EventType.StartGame, StartGame);
         Init();
+    }
+
+
+    private void OnDestroy()
+    {
+        EventCenter.RemoveListener(EventType.StartGame, StartGame);
     }
 
     private void Init() {
@@ -50,7 +59,7 @@ public class SelfManagerOnlint : MonoBehaviour {
         btnCompareRight.onClick.AddListener(OnCompareRightButtonClick);
         goBottomButton = transform.Find("goBottomButton").gameObject;
         goCountDown = transform.Find("goCountDown").gameObject;
-        goTxtGiveUp = transform.Find("goTxtGiveUp").gameObject;
+        txtHint = transform.Find("txtHint").GetComponent<Text>();
         imgHead = transform.Find("imgHead").GetComponent<Image>();
         imgBanker = transform.Find("imgBanker").GetComponent<Image>();
         txtName = transform.Find("txtName").GetComponent<Text>();
@@ -65,6 +74,8 @@ public class SelfManagerOnlint : MonoBehaviour {
         tog10 = transform.Find("goBottomButton/tog10").GetComponent<Toggle>();
         btnReady = transform.Find("btnReady").GetComponent<Button>();
         btnReady.onClick.AddListener(OnReadyButtonClick);
+        btnUnReady = transform.Find("btnUnReady").GetComponent<Button>();
+        btnUnReady.onClick.AddListener(OnUnReadyButtonClick);
         btnLookCard = transform.Find("goBottomButton/btnLookCard").GetComponent<Button>();
         btnLookCard.onClick.AddListener(OnLookCardBtnClick);
         btnFollowStakes = transform.Find("goBottomButton/btnFollowStakes").GetComponent<Button>();
@@ -88,9 +99,10 @@ public class SelfManagerOnlint : MonoBehaviour {
 
         goBottomButton.SetActive(false);
         imgBanker.gameObject.SetActive(false);
-        goTxtGiveUp.SetActive(false);
+        txtHint.gameObject.SetActive(false);
         goCountDown.SetActive(false);
         goCompareBtns.SetActive(false);
+        btnUnReady.gameObject.SetActive(false); 
 
         txtStakesSum.text = "0";
         if (Models.GameModel.userDto != null) {
@@ -98,6 +110,26 @@ public class SelfManagerOnlint : MonoBehaviour {
             txtName.text = Models.GameModel.userDto.name;
             txtCoin.text = Models.GameModel.userDto.coin.ToString();
         }
+    }
+
+    /// <summary>
+    /// 开始游戏
+    /// </summary>
+    private void StartGame()
+    {
+        txtHint.gameObject.SetActive(false);
+        btnUnReady.gameObject.SetActive(false);
+    }
+
+    /// <summary>
+    /// 取消准备
+    /// </summary>
+    private void OnUnReadyButtonClick()
+    {
+        btnReady.gameObject.SetActive(true);
+        btnUnReady.gameObject.SetActive(false);
+        txtHint.gameObject.SetActive(false);
+        NetMsgCenter.Instance.SendMsg(OpCode.Match, MatchCode.UnReady_CREQ, (int)Models.GameModel.RoomType);
     }
 
     /// <summary>
@@ -139,7 +171,11 @@ public class SelfManagerOnlint : MonoBehaviour {
     /// 准备按钮点击事件
     /// </summary>
     private void OnReadyButtonClick() {
-        throw new NotImplementedException();
+        btnReady.gameObject.SetActive(false);
+        btnUnReady.gameObject.SetActive(true);
+        txtHint.text = "已准备";
+        txtHint.gameObject.SetActive(true);
+        NetMsgCenter.Instance.SendMsg(OpCode.Match, MatchCode.Ready_CREQ, (int)Models.GameModel.RoomType);
     }
 
     /// <summary>

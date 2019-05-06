@@ -48,6 +48,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Cache\Caches.cs" />
+    <Compile Include="Cache\Fight\CardLibrary.cs" />
+    <Compile Include="Cache\Fight\FightCache.cs" />
+    <Compile Include="Cache\Fight\FightRoom.cs" />
+    <Compile Include="Cache\Fight\RoundModel.cs" />
     <Compile Include="Cache\MatchCache.cs" />
     <Compile Include="Cache\MatchRoom.cs" />
     <Compile Include="Database\DatabaseManager.cs" />

@@ -8,3 +8,9 @@ G:\UnityDocuments\GoldenFraud\GoldenFraud\Assets\Scripts\Protocol.dll
 G:\UnityDocuments\GoldenFraud\GoldenFraud\Assets\Scripts\Protocol.pdb
 G:\UnityDocuments\GoldenFraud\GoldenFraud\Assets\Scripts\Net\Dll\Protocol.dll
 G:\UnityDocuments\GoldenFraud\GoldenFraud\Assets\Scripts\Net\Dll\Protocol.pdb
+D:\UnityProject\GoldenFraud\GoldenFraud\Assets\Scripts\Net\Dll\Protocol.dll
+D:\UnityProject\GoldenFraud\GoldenFraud\Assets\Scripts\Net\Dll\Protocol.pdb
+D:\UnityProject\GoldenFraud\MyServer\Protocol\obj\Debug\Protocol.csprojAssemblyReference.cache
+D:\UnityProject\GoldenFraud\MyServer\Protocol\obj\Debug\Protocol.csproj.CoreCompileInputs.cache
+D:\UnityProject\GoldenFraud\MyServer\Protocol\obj\Debug\Protocol.dll
+D:\UnityProject\GoldenFraud\MyServer\Protocol\obj\Debug\Protocol.pdb

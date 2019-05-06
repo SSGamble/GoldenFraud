@@ -13,5 +13,10 @@ public enum EventType
     ShowRoomChoosePanel,
     VSAI,
     VSWithSelf,
-    GameOver
+    GameOver,
+
+    // Online
+    RefreshUI,
+    StartGame
+
 }

@@ -24,5 +24,9 @@ public class GameModel {
     /// 房间类型
     /// </summary>
     public RoomType RoomType { get; set; }
+    /// <summary>
+    /// 匹配房间传输模型
+    /// </summary>
+    public MatchRoomDto MatchRoomDto { get; set; }
 
 }
