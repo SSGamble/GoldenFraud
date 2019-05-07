@@ -268,7 +268,7 @@ namespace GameServer.Cache.Fight
             {
                 if (playerList[i].id == currentId)
                 {
-                    if (playerList[i].id == 2)
+                    if (i == playerList.Count - 1)
                     {
                         return playerList[0].id;
                     }
@@ -286,15 +286,17 @@ namespace GameServer.Cache.Fight
         /// </summary>
         /// <param name="id"></param>
         /// <param name="stakesSum"></param>
-        public void UpdatePlayerStakesSum(int id,int stakes)
+        public int UpdatePlayerStakesSum(int id,int stakes)
         {
             foreach (var player in playerList)
             {
                 if (player.id == id)
                 {
-                    player.stakesSum += stakes; // TODO
+                    player.stakesSum += stakes;
+                    return player.stakesSum;
                 }
             }
+            return 0;
         }
 
         /// <summary>
@@ -309,6 +311,30 @@ namespace GameServer.Cache.Fight
             giveUpUserIdList.Clear();
             stakesSum = 0;
             bankerIndex = -1;
+        }
+
+        /// <summary>
+        /// 重置位置，给 3 个玩家排序
+        /// </summary>
+        public void ResetPosition(int bankerId) {
+            // x a b
+            if (playerList[0].id == bankerId) {
+                PlayerDto dto = playerList[1];
+                playerList[1] = playerList[2];
+                playerList[2] = dto;
+            }
+            // a x b
+            if (playerList[1].id == bankerId) {
+                PlayerDto dto = playerList[0];
+                playerList[0] = playerList[2];
+                playerList[2] = dto;
+            }
+            // a b x
+            if (playerList[2].id == bankerId) {
+                PlayerDto dto = playerList[0];
+                playerList[0] = playerList[1];
+                playerList[1] = dto;
+            }
         }
     }
 }

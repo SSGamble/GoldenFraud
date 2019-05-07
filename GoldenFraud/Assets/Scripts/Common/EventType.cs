@@ -17,6 +17,17 @@ public enum EventType
 
     // Online
     RefreshUI,
-    StartGame
+    StartGame,
+    LeftDealCard,
+    RightDealCard,
+    SelfDealCard,
+    LeftBanker,
+    RightBanker,
+    SelfBanker,
+    LeaveFightRoom,
+    StartStakes,
+    LookCardBRO,
+    PutStakesBRO,
+    GiveUpCardBRO
 
 }

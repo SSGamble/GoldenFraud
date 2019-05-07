@@ -56,6 +56,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ServerPeer.cs" />
     <Compile Include="ThreadSafeInt.cs" />
+    <Compile Include="TimerTool\TimerManager.cs" />
+    <Compile Include="TimerTool\TimerModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">

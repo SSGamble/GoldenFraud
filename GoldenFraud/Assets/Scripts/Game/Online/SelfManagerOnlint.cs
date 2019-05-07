@@ -3,6 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
 using Protocol.Code;
+using Protocol.Dto;
+using Protocol.Dto.Fight;
+using Protocol.Fight;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -35,23 +38,131 @@ public class SelfManagerOnlint : MonoBehaviour {
 
     protected StakesHint stakesHint;
     protected List<GameObject> goCardList = new List<GameObject>(); // 自身的 3 张牌
+    protected List<CardDto> cardList = new List<CardDto>(); // 牌的集合
     protected float cardPointX = -40f; // 牌的到达位置
     protected bool isStartStakes = false; // 开始下注的标志位，用于计时
     protected float time = 60f; // 倒计时
     protected float timer = 0.0f; // 计时器
+    private PlayerDto playerDto;
+
+    private GameManagerOnline gameManager;
 
     private void Awake() {
+        EventCenter.AddListener<StakesDto>(EventType.PutStakesBRO, PutStakesBRO);
+        EventCenter.AddListener<int>(EventType.StartStakes, StartStakes);
+        EventCenter.AddListener<int>(EventType.GiveUpCardBRO, GiveUpCardBRO);
+        EventCenter.AddListener<PlayerDto>(EventType.SelfDealCard, DealCard);
+        EventCenter.AddListener(EventType.SelfBanker, Banker);
         EventCenter.AddListener(EventType.StartGame, StartGame);
         Init();
     }
 
 
-    private void OnDestroy()
-    {
+    private void OnDestroy() {
+        EventCenter.RemoveListener<StakesDto>(EventType.PutStakesBRO, PutStakesBRO);
+        EventCenter.RemoveListener<int>(EventType.StartStakes, StartStakes);
+        EventCenter.RemoveListener<int>(EventType.GiveUpCardBRO, GiveUpCardBRO);
+        EventCenter.RemoveListener<PlayerDto>(EventType.SelfDealCard, DealCard);
+        EventCenter.RemoveListener (EventType.SelfBanker, Banker);
         EventCenter.RemoveListener(EventType.StartGame, StartGame);
     }
 
+    private void FixedUpdate() {
+        // 选中的倍数变黑
+        if (tog2.isOn) {
+            tog2.GetComponent<Image>().color = Color.gray;
+            tog5.GetComponent<Image>().color = Color.white;
+            tog10.GetComponent<Image>().color = Color.white;
+        }
+        if (tog5.isOn) {
+            tog5.GetComponent<Image>().color = Color.gray;
+            tog2.GetComponent<Image>().color = Color.white;
+            tog10.GetComponent<Image>().color = Color.white;
+        }
+        if (tog10.isOn) {
+            tog10.GetComponent<Image>().color = Color.gray;
+            tog5.GetComponent<Image>().color = Color.white;
+            tog2.GetComponent<Image>().color = Color.white;
+        }
+        if (isStartStakes) {
+            if (time <= 0) {
+                isStartStakes = false;
+                time = 60;
+                timer = 0;
+                return;
+            }
+            timer += Time.deltaTime;
+            if (timer >= 1) {
+                timer = 0;
+                time--;
+                txtCountDown.text = time.ToString();
+            }
+        }
+    }
+
+    /// <summary>
+    /// 有玩家弃牌的广播
+    /// </summary>
+    /// <param name="giveupUserid"></param>
+    private void GiveUpCardBRO(int giveUpUserId) {
+        // 自身弃牌
+        if (giveUpUserId == Models.GameModel.userDto.id) {
+            goBottomButton.SetActive(false);
+            goCountDown.SetActive(false);
+            isStartStakes = false;
+            txtHint.text = "已弃牌";
+            txtHint.gameObject.SetActive(true);
+            goCompareBtns.SetActive(false);
+            foreach (var item in goCardList) {
+                Destroy(item);
+            }
+        }
+    }
+
+    /// <summary>
+    /// 有玩家下注的服务器广播
+    /// </summary>
+    /// <param name="arg"></param>
+    private void PutStakesBRO(StakesDto dto) {
+        // 自身
+        if (dto.userId == Models.GameModel.userDto.id) {
+            txtCoin.text = dto.remainCoin.ToString();
+            if (dto.stakesType == StakesDto.StakesType.NoLook) {
+                stakesHint.ShowHint(dto.stakesCount + "不看");
+                txtStakesSum.text = dto.stakesSum.ToString();
+            }
+            else {
+                stakesHint.ShowHint(dto.stakesCount + "看看");
+                txtStakesSum.text = dto.stakesSum.ToString();
+            }
+        }
+        goCountDown.SetActive(false);
+        SetBtnInteractable(false);
+        isStartStakes = false;
+        goCompareBtns.SetActive(false);
+    }
+
+    /// <summary>
+    /// 开始下注
+    /// </summary>
+    /// <param name="arg"></param>
+    private void StartStakes(int userId) {
+        if (userId == Models.GameModel.userDto.id) {
+            time = 60;
+            goCountDown.SetActive(true);
+            txtCountDown.text = "60";
+            isStartStakes = true;
+            SetBtnInteractable(true);
+        }
+        else {
+            goCountDown.SetActive(false);
+            isStartStakes = false;
+            SetBtnInteractable(false);
+        }
+    }
+
     private void Init() {
+        gameManager = GetComponentInParent<GameManagerOnline>();
         goCompareBtns = transform.Find("goCompareBtns").gameObject;
         btnCompareLeft = goCompareBtns.transform.Find("btnCompareLeft").GetComponent<Button>();
         btnCompareLeft.onClick.AddListener(OnCompareLeftButtonClick);
@@ -113,10 +224,65 @@ public class SelfManagerOnlint : MonoBehaviour {
     }
 
     /// <summary>
+    /// 发牌完成后
+    /// </summary>
+    private void DealCardFinished() {
+        goBottomButton.SetActive(true);
+        SetBtnInteractable(false);
+    }
+
+    /// <summary>
+    /// 发牌
+    /// </summary>
+    /// <param name="arg"></param>
+    private void DealCard(PlayerDto player) {
+        playerDto = player;
+        goCardList.Clear();
+        this.cardList = player.cardLidt;
+        foreach (var card in player.cardLidt) {
+            SendCard(0.3f, new Vector3(0, 350, 0));
+        }
+        DealCardFinished();
+    }
+
+    /// <summary>
+    /// 设置底部按钮是否可以交互
+    /// </summary>
+    private void SetBtnInteractable(bool value) {
+        btnFollowStakes.interactable = value; // 设置按钮是否交互
+        btnAddStakes.interactable = value;
+        btnCompareCard.interactable = value;
+        btnGiveUp.interactable = value;
+        tog2.interactable = value;
+        tog5.interactable = value;
+        tog10.interactable = value;
+    }
+
+    /// <summary>
+    /// 发牌
+    /// </summary>
+    public void SendCard(float duration, Vector3 initPos) {
+        GameObject go = Instantiate(goCardPre, cardPoint); // 实例化牌
+        go.GetComponent<RectTransform>().localPosition = initPos; // 设置牌的初始位置在发牌点
+        go.GetComponent<RectTransform>().DOLocalMove(new Vector3(cardPointX, 0, 0), duration); // 移动到目标位置
+        goCardList.Add(go);
+        cardPointX += 40; // 3 张牌 40 的位置间隔
+    }
+
+
+    /// <summary>
+    /// 成为庄家
+    /// </summary>
+    private void Banker() {
+        imgBanker.gameObject.SetActive(true);
+    }
+
+    /// <summary>
     /// 开始游戏
     /// </summary>
     private void StartGame()
     {
+        txtStakesSum.text = playerDto.stakesSum.ToString();
         txtHint.gameObject.SetActive(false);
         btnUnReady.gameObject.SetActive(false);
     }
@@ -136,35 +302,55 @@ public class SelfManagerOnlint : MonoBehaviour {
     /// 加注按钮点击事件
     /// </summary>
     private void OnAddStakesButtonClick() {
-        throw new NotImplementedException();
+        if (tog2.isOn) {
+            NetMsgCenter.Instance.SendMsg(OpCode.Fight, FightCode.AddStakes_CREQ, 2);
+        }
+        if (tog5.isOn) {
+            NetMsgCenter.Instance.SendMsg(OpCode.Fight, FightCode.AddStakes_CREQ, 5);
+        }
+        if (tog10.isOn) {
+            NetMsgCenter.Instance.SendMsg(OpCode.Fight, FightCode.AddStakes_CREQ, 10);
+        }
     }
 
     /// <summary>
     /// 比牌按钮点击事件
     /// </summary>
     private void OnCompareBtnClick() {
-        throw new NotImplementedException();
+        goCompareBtns.SetActive(true);
+        if (gameManager.LeftIsGiveUp||gameManager.LeftIsLeave) {
+            btnCompareLeft.gameObject.SetActive(false);
+        }
+        if (gameManager.RightIsGiveUp || gameManager.RightIsLeave) {
+            btnCompareRight.gameObject.SetActive(false);
+        }
     }
 
     /// <summary>
     /// 弃牌按钮点击事件
     /// </summary>
     private void OnGiveUpButtonClick() {
-        throw new NotImplementedException();
+        NetMsgCenter.Instance.SendMsg(OpCode.Fight, FightCode.GiveUpCard_CREQ, null);
+
     }
 
     /// <summary>
     /// 跟注按钮点击事件
     /// </summary>
     private void OnFollowBtnClick() {
-        throw new NotImplementedException();
+        NetMsgCenter.Instance.SendMsg(OpCode.Fight, FightCode.Follow_CREQ, null);
     }
 
     /// <summary>
     /// 看牌按钮点击事件
     /// </summary>
     private void OnLookCardBtnClick() {
-        throw new NotImplementedException();
+        btnLookCard.interactable = false;
+        for (int i = 0; i < cardList.Count; i++) {
+            string cardName = "card_" + cardList[i].Color.ToString() + "_" + cardList[i].Weight.ToString();
+            goCardList[i].GetComponent<Image>().sprite = ResourcesManager.LoadCardSprite(cardName);
+        }
+        NetMsgCenter.Instance.SendMsg(OpCode.Fight, FightCode.LookCard_CREQ, null);
     }
 
     /// <summary>
@@ -182,14 +368,16 @@ public class SelfManagerOnlint : MonoBehaviour {
     /// 与右边玩家比牌
     /// </summary>
     private void OnCompareRightButtonClick() {
-        throw new NotImplementedException();
+        btnCompareLeft.gameObject.SetActive(false);
+        NetMsgCenter.Instance.SendMsg(OpCode.Fight, FightCode.CompareCard_CREQ, Models.GameModel.MatchRoomDto.RightPlayerId);
     }
 
     /// <summary>
     /// 与左边玩家比牌
     /// </summary>
     private void OnCompareLeftButtonClick() {
-        throw new NotImplementedException();
+        btnCompareRight.gameObject.SetActive(false);
+        NetMsgCenter.Instance.SendMsg(OpCode.Fight, FightCode.CompareCard_CREQ, Models.GameModel.MatchRoomDto.LeftPlayerId);
     }
 
     /// <summary>

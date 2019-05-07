@@ -203,12 +203,19 @@ namespace GameServer.Database {
                 int remainCoin = reader.GetInt32("coin");
                 reader.Close();
 
+                int afterCoin = remainCoin + coin; // 剩余的金币数
+                if (coin<0) {
+                    if (remainCoin<-coin) { // 不够扣
+                        afterCoin = 0;
+                    }
+                }
+
                 MySqlCommand cmd1 = new MySqlCommand("update user set coin = @coin where id = @id", sqlConnection);
                 cmd1.Parameters.AddWithValue("id", id);
-                cmd1.Parameters.AddWithValue("coin", remainCoin + coin);
+                cmd1.Parameters.AddWithValue("coin", afterCoin);
                 cmd1.ExecuteNonQuery();
 
-                return remainCoin + coin;
+                return afterCoin;
             }
             reader.Close();
             return 0;
