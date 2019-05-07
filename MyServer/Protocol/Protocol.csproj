@@ -49,6 +49,7 @@
     <Compile Include="Constant\CardType.cs" />
     <Compile Include="Constant\Identity.cs" />
     <Compile Include="Dto\AccountDto.cs" />
+    <Compile Include="Dto\Fight\ChatDto.cs" />
     <Compile Include="Dto\Fight\CompareResultDto.cs" />
     <Compile Include="Dto\Fight\GameOverDto.cs" />
     <Compile Include="Dto\Fight\StakesDto.cs" />

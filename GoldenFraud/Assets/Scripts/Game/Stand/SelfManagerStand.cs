@@ -145,18 +145,20 @@ public class SelfManagerStand : BaseManagerStand {
     /// 与左边比牌按钮点击事件
     /// </summary>
     private void OnCompareLeftButtonClick() {
-        Debug.Log("left");
         gameManager.SelfCompareLeft();
         SetBtnInteractable(false);
+        goCompareBtns.SetActive(false);
+        StakesAfter(gameManager.Stakes(0), "看看");
     }
 
     /// <summary>
     /// 与右边比牌按钮点击事件
     /// </summary>
     private void OnCompareRightButtonClick() {
-        Debug.Log("right");
         gameManager.SelfCompareRight();
         SetBtnInteractable(false);
+        goCompareBtns.SetActive(false);
+        StakesAfter(gameManager.Stakes(0), "看看");
     }
 
     /// <summary>

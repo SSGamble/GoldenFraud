@@ -252,15 +252,16 @@ namespace GameServer.Logic {
                 room.giveUpUserIdList.Add(client.Id);
                 room.Broadcast(OpCode.Fight, FightCode.GiveUpCard_BRO, client.Id);
 
-                //离开的玩家是本次下注的玩家,这样的需转换下一个玩家下注
+                // 离开的玩家是本次下注的玩家,这样的需转换下一个玩家下注
                 if (room.roundModel.CurrentStakesUserId == client.Id) {
                     //轮换下注
                     Turn(client);
                 }
+                // 一个弃牌，一个逃跑
                 if (room.giveUpUserIdList.Count >= 1 && room.leaveUserIdList.Count >= 1) {
                     GameOver(room);
                 }
-                //游戏结束
+                // 两个逃跑
                 if (room.giveUpUserIdList.Count == 2) {
                     GameOver(room);
                 }
@@ -278,7 +279,7 @@ namespace GameServer.Logic {
                 FightRoom room = fightCache.GetFightRoomByUserId(userId);
                 room.giveUpUserIdList.Add(userId);
                 room.Broadcast(OpCode.Fight, FightCode.GiveUpCard_BRO, userId);
-
+                // 一个弃牌，一个逃跑
                 if (room.giveUpUserIdList.Count >= 1 && room.leaveUserIdList.Count >= 1) {
                     GameOver(room);
                 }
@@ -406,7 +407,7 @@ namespace GameServer.Logic {
             else {
                 timerClient = DatabaseManager.GetClientPeerByUserId(nextID);
                 // 添加计时器任务
-                TimerManager.Instance.AddTimerEvent(10, TimerDelegate);
+                TimerManager.Instance.AddTimerEvent(60, TimerDelegate);
                 Console.WriteLine("当前下注者" + client.UserName);
                 room.Broadcast(OpCode.Fight, FightCode.StartStakes_BRO, nextID);
             }
@@ -442,14 +443,18 @@ namespace GameServer.Logic {
                     // 轮换下注
                     Turn(client);
                 }
-                // 游戏结束
+                // 一个弃牌，一个逃跑
+                if (room.giveUpUserIdList.Count >= 1 && room.leaveUserIdList.Count >= 1) {
+                    GameOver(room);
+                }
+                // 2 个离开
                 if (room.leaveUserIdList.Count == 2) {
                     GameOver(room);
                     return;
                 }
-                // 销毁房间
+                // 3 个离开
                 if (room.leaveUserIdList.Count == 3) {
-                    fightCache.DesRoom(room);
+                    fightCache.DesRoom(room); // 销毁房间
                 }
             });
         }

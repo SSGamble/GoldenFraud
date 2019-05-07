@@ -52,6 +52,15 @@ public class GameOverPanelOnline : MonoBehaviour {
 
         lose2.txtName.text = dto.loseDtoList[1].name;
         lose2.txtCoin.text = (-dto.loseDtoList[1].stakesSum).ToString();
+
+        if (dto.winDto.id == Models.GameModel.userDto.id) {
+            audio.clip = winClip;
+            audio.Play();
+        }
+        else {
+            audio.clip = loseClip;
+            audio.Play();
+        }
     }
 
     /// <summary>

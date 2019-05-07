@@ -11,6 +11,10 @@ using UnityEngine.UI;
 
 public class SelfManagerOnlint : MonoBehaviour {
 
+    private AudioSource audio;
+    public AudioClip startClip;
+    public AudioClip giveUpClip;
+
     public GameObject goCardPre;
     protected GameObject goCountDown;
     protected Image imgHead;
@@ -63,7 +67,7 @@ public class SelfManagerOnlint : MonoBehaviour {
         EventCenter.RemoveListener<int>(EventType.StartStakes, StartStakes);
         EventCenter.RemoveListener<int>(EventType.GiveUpCardBRO, GiveUpCardBRO);
         EventCenter.RemoveListener<PlayerDto>(EventType.SelfDealCard, DealCard);
-        EventCenter.RemoveListener (EventType.SelfBanker, Banker);
+        EventCenter.RemoveListener(EventType.SelfBanker, Banker);
         EventCenter.RemoveListener(EventType.StartGame, StartGame);
     }
 
@@ -107,6 +111,8 @@ public class SelfManagerOnlint : MonoBehaviour {
     private void GiveUpCardBRO(int giveUpUserId) {
         // 自身弃牌
         if (giveUpUserId == Models.GameModel.userDto.id) {
+            audio.clip = startClip;
+            audio.Play();
             goBottomButton.SetActive(false);
             goCountDown.SetActive(false);
             isStartStakes = false;
@@ -162,6 +168,7 @@ public class SelfManagerOnlint : MonoBehaviour {
     }
 
     private void Init() {
+        audio = GetComponent<AudioSource>();
         gameManager = GetComponentInParent<GameManagerOnline>();
         goCompareBtns = transform.Find("goCompareBtns").gameObject;
         btnCompareLeft = goCompareBtns.transform.Find("btnCompareLeft").GetComponent<Button>();
@@ -213,7 +220,7 @@ public class SelfManagerOnlint : MonoBehaviour {
         txtHint.gameObject.SetActive(false);
         goCountDown.SetActive(false);
         goCompareBtns.SetActive(false);
-        btnUnReady.gameObject.SetActive(false); 
+        btnUnReady.gameObject.SetActive(false);
 
         txtStakesSum.text = "0";
         if (Models.GameModel.userDto != null) {
@@ -280,8 +287,9 @@ public class SelfManagerOnlint : MonoBehaviour {
     /// <summary>
     /// 开始游戏
     /// </summary>
-    private void StartGame()
-    {
+    private void StartGame() {
+        audio.clip = startClip;
+        audio.Play();
         txtStakesSum.text = playerDto.stakesSum.ToString();
         txtHint.gameObject.SetActive(false);
         btnUnReady.gameObject.SetActive(false);
@@ -290,8 +298,7 @@ public class SelfManagerOnlint : MonoBehaviour {
     /// <summary>
     /// 取消准备
     /// </summary>
-    private void OnUnReadyButtonClick()
-    {
+    private void OnUnReadyButtonClick() {
         btnReady.gameObject.SetActive(true);
         btnUnReady.gameObject.SetActive(false);
         txtHint.gameObject.SetActive(false);
@@ -318,7 +325,7 @@ public class SelfManagerOnlint : MonoBehaviour {
     /// </summary>
     private void OnCompareBtnClick() {
         goCompareBtns.SetActive(true);
-        if (gameManager.LeftIsGiveUp||gameManager.LeftIsLeave) {
+        if (gameManager.LeftIsGiveUp || gameManager.LeftIsLeave) {
             btnCompareLeft.gameObject.SetActive(false);
         }
         if (gameManager.RightIsGiveUp || gameManager.RightIsLeave) {
