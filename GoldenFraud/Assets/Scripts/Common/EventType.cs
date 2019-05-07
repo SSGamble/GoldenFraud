@@ -28,6 +28,7 @@ public enum EventType
     StartStakes,
     LookCardBRO,
     PutStakesBRO,
-    GiveUpCardBRO
+    GiveUpCardBRO,
+    CompareCardBRO
 
 }

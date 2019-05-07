@@ -9,6 +9,7 @@ namespace Protocol.Dto.Fight {
     /// </summary>
     [Serializable]
     public class CompareResultDto {
+
         public PlayerDto winDto;
         public PlayerDto loseDto;
 

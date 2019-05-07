@@ -4,6 +4,7 @@ using GameServer.Database;
 using MyServer;
 using MyServer.TimerTool;
 using Protocol.Code;
+using Protocol.Constant;
 using Protocol.Dto;
 using Protocol.Dto.Fight;
 using System;
@@ -21,6 +22,14 @@ namespace GameServer.Logic {
         /// 下注的传输模型
         /// </summary>
         private StakesDto stakesDto = new StakesDto();
+        /// <summary>
+        /// 比牌结果传输模型
+        /// </summary>
+        private CompareResultDto resultDto = new CompareResultDto();
+        /// <summary>
+        /// 游戏结束传输模型
+        /// </summary>
+        private GameOverDto gameOverDto = new GameOverDto();
 
         public void Disconnect(MyServer.ClientPeer client) {
             LeaveRoom(client);
@@ -51,10 +60,185 @@ namespace GameServer.Logic {
             }
         }
 
-        private void CompareCard(ClientPeer client, int value) {
-            throw new NotImplementedException();
+        /// <summary>
+        /// 客户端比牌的处理
+        /// </summary>
+        /// <param name="compareClient"></param>
+        /// <param name="comparedID"></param>
+        private void CompareCard(ClientPeer compareClient, int comparedID) {
+            SingleExecute.Instance.Exeecute(() => {
+                if (fightCache.IsFighting(compareClient.Id) == false) return;
+
+                FightRoom room = fightCache.GetFightRoomByUserId(compareClient.Id);
+                room.stakesSum += room.lastPlayerStakes;
+                int stakesSum = room.UpdatePlayerStakesSum(compareClient.Id, room.lastPlayerStakes);
+                int remainCoin = DatabaseManager.UpdateCoin(compareClient.Id, -room.lastPlayerStakes);
+                stakesDto.Change(compareClient.Id, remainCoin, room.lastPlayerStakes, stakesSum, StakesDto.StakesType.Look);
+                room.Broadcast(OpCode.Fight, FightCode.PutStakes_BRO, stakesDto);
+
+                // 拿到 3 个玩家的 DTO
+                PlayerDto c1Dto = null, c2Dto = null, otherDto = null;
+                foreach (var player in room.playerList) {
+                    if (player.id == compareClient.Id) {
+                        c1Dto = player;
+                    }
+                    else if (player.id == comparedID) {
+                        c2Dto = player;
+                    }
+                    else {
+                        otherDto = player;
+                    }
+                }
+                ClientPeer otherClient = DatabaseManager.GetClientPeerByUserId(otherDto.id);
+                // 比牌
+                CompareCard(room,compareClient,c1Dto,c2Dto, otherClient);
+            });
         }
 
+        /// <summary>
+        /// 比牌结果
+        /// </summary>
+        private void CompareResult(FightRoom room,ClientPeer c1,PlayerDto winDto,PlayerDto loseDto,ClientPeer otherClient) {
+            // 转到胜利的玩家下注
+            Turn(c1,winDto.id);
+            // 输了的玩家弃牌
+            GiveUpCard(loseDto.id);
+            resultDto.Change(winDto,loseDto);
+            Console.WriteLine("胜利者：" + winDto.name + "  失败者: " + loseDto.name);
+            room.Broadcast(OpCode.Fight, FightCode.CompareCard_BRO,resultDto, otherClient);
+        }
+
+        /// <summary>
+        /// 比牌的逻辑算法
+        /// </summary>
+        private void CompareCard(FightRoom room,ClientPeer c1Client, PlayerDto c1, PlayerDto c2,ClientPeer otherClient) {
+            bool c1Win = false;
+            // 牌型比较
+            if (c1.cardType > c2.cardType) { // c1 胜
+                c1Win = true;
+            }
+            else if (c1.cardType == c2.cardType) { // 牌型相同
+                                                   // 单张
+                if (c1.cardType == CardType.Sin) {
+                    c1Win = CompareSinCard(room,c1Client,c1, c2,otherClient);
+                }
+
+                // 对子 662 663 / 766 866 / 662 966
+                if (c1.cardType == CardType.Double) {
+                    int c1Double = 0, c1Sin = 0, c2Double = 0, c2Sin = 0;
+                    // c1
+                    if (c1.cardLidt[0].Weight == c1.cardLidt[1].Weight) { // 对子在前
+                        c1Double = c1.cardLidt[0].Weight;
+                        c1Sin = c1.cardLidt[2].Weight;
+                    }
+                    if (c1.cardLidt[1].Weight == c1.cardLidt[2].Weight) { // 对子在后
+                        c1Double = c1.cardLidt[1].Weight;
+                        c1Sin = c1.cardLidt[0].Weight;
+                    }
+                    // c2
+                    if (c2.cardLidt[0].Weight == c2.cardLidt[1].Weight) { // 对子在前
+                        c2Double = c2.cardLidt[0].Weight;
+                        c2Sin = c2.cardLidt[2].Weight;
+                    }
+                    if (c2.cardLidt[1].Weight == c2.cardLidt[2].Weight) { // 对子在后
+                        c2Double = c2.cardLidt[1].Weight;
+                        c2Sin = c2.cardLidt[0].Weight;
+                    }
+                    // 比较对子
+                    if (c1Double > c2Double) {
+                        c1Win = true;
+                    }
+                    else if (c1Double == c2Double) {
+                        // 比较单张
+                        if (c1Sin > c2Sin) {
+                            c1Win = true;
+                        }
+                        else {
+                            c1Win = false;
+                        }
+                    }
+                    else {
+                        c1Win = false;
+                    }
+                }
+
+                // 顺子,顺金，豹子，都直接比较 3 张牌加起来的值，谁大谁赢
+                if (c1.cardType == CardType.Sequence || c1.cardType == CardType.SGolden || c1.cardType == CardType.Leopard) {
+                    // 获取和
+                    int c1Sum = 0, c2Sum = 0;
+                    for (int i = 0; i < c1.cardLidt.Count; i++) {
+                        c1Sum += c1.cardLidt[i].Weight;
+                    }
+                    for (int i = 0; i < c2.cardLidt.Count; i++) {
+                        c2Sum += c2.cardLidt[i].Weight;
+                    }
+                    // 比较和
+                    if (c1Sum > c2Sum) {
+                        c1Win = true;
+                    }
+                    else {
+                        c1Win = false;
+                    }
+                }
+
+                // 金花
+                if (c1.cardType == CardType.SGolden) {
+                    c1Win = CompareSinCard(room,c1Client,c1, c2,otherClient);
+                }
+
+                // Max 235
+                if (c1.cardType == CardType.Max) {
+                    c1Win = false;
+                }
+
+            }
+            else { // c1 输
+                c1Win = false;
+            }
+
+            if (c1Win) {
+                CompareResult(room,c1Client,c1,c2,otherClient);
+            }
+            else {
+                CompareResult(room,c1Client,c2,c1,otherClient);
+            }
+        }
+
+        /// <summary>
+        /// 按单张比较牌
+        /// </summary>
+        /// <param name="c1"></param>
+        /// <param name="c2"></param>
+        /// <returns></returns>
+        private bool CompareSinCard(FightRoom room, ClientPeer c1Client, PlayerDto c1, PlayerDto c2, ClientPeer otherClient) {
+            bool c1Win = false;
+            // 第一张
+            if (c1.cardLidt[0].Weight > c2.cardLidt[0].Weight) {
+                c1Win = true;
+            }
+            else if (c1.cardLidt[0].Weight == c2.cardLidt[0].Weight) {
+                // 第 2 张
+                if (c1.cardLidt[1].Weight > c2.cardLidt[1].Weight) {
+                    c1Win = true;
+                }
+                else if (c1.cardLidt[1].Weight == c2.cardLidt[1].Weight) {
+                    // 第 3 张
+                    if (c1.cardLidt[2].Weight > c2.cardLidt[2].Weight) {
+                        c1Win = true;
+                    }
+                    else {
+                        c1Win = false;
+                    }
+                }
+                else {
+                    c1Win = false;
+                }
+            }
+            else {
+                c1Win = false;
+            }
+            return c1Win;
+        }
 
         /// <summary>
         /// 客户端弃牌的请求处理
@@ -83,6 +267,10 @@ namespace GameServer.Logic {
             });
         }
 
+        /// <summary>
+        /// 弃牌，不需要转换下注
+        /// </summary>
+        /// <param name="userId"></param>
         private void GiveUpCard(int userId) {
             SingleExecute.Instance.Exeecute(() => {
                 if (fightCache.IsFighting(userId) == false) return;
@@ -110,19 +298,20 @@ namespace GameServer.Logic {
             List<PlayerDto> loseList = new List<PlayerDto>();
 
             foreach (var player in room.playerList) {
-                //胜利的玩家
+                // 胜利的玩家
                 if (!room.IsGiveUpCard(player.id) && !room.IsLeaveRoom(player.id)) {
                     winPlayer = player;
                 }
+                // 失败的玩家们
                 else {
                     loseList.Add(player);
                 }
             }
             DatabaseManager.UpdateCoin(winPlayer.id, room.stakesSum);
-            overDto.Change(winPlayer, loseList, room.stakesSum);
-            room.Broadcast(OpCode.Fight, FightCode.GameOver_BRO, overDto);
+            gameOverDto.Change(winPlayer, loseList, room.stakesSum);
+            room.Broadcast(OpCode.Fight, FightCode.GameOver_BRO, gameOverDto);
             //销毁房间
-            fightCache.DestoryRoom(room);
+            fightCache.DesRoom(room);
             //清空定时任务
             TimerManager.Instance.Clear();
         }
@@ -202,7 +391,7 @@ namespace GameServer.Logic {
         /// 轮换下注
         /// </summary>
         /// <param name="client"></param>
-        private void Turn(ClientPeer client) {
+        private void Turn(ClientPeer client, int turnUserId = -1) {
             // 清空计时器任务
             TimerManager.Instance.Clear();
             if (fightCache.IsFighting(client.Id) == false) {
@@ -210,9 +399,9 @@ namespace GameServer.Logic {
             }
             FightRoom room = fightCache.GetFightRoomByUserId(client.Id);
             int nextID = room.Turn();
-            if (room.IsGiveUpCard(nextID) || room.IsLeaveRoom(nextID)) {
+            if (room.IsGiveUpCard(nextID) || room.IsLeaveRoom(nextID) || (turnUserId != -1 && nextID != turnUserId)) {
                 // 如果下一位玩家离开或弃牌了，就继续轮换下注，直到改玩家不离开也不弃牌为止
-                Turn(client);
+                Turn(client,turnUserId);
             }
             else {
                 timerClient = DatabaseManager.GetClientPeerByUserId(nextID);
@@ -255,6 +444,7 @@ namespace GameServer.Logic {
                 }
                 // 游戏结束
                 if (room.leaveUserIdList.Count == 2) {
+                    GameOver(room);
                     return;
                 }
                 // 销毁房间
