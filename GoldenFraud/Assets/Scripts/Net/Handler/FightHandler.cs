@@ -32,6 +32,9 @@ public class FightHandler : BaseHandler {
             case FightCode.CompareCard_BRO:
                 EventCenter.Broadcast(EventType.CompareCardBRO, (CompareResultDto)value);
                 break;
+            case FightCode.GameOver_BRO:
+                EventCenter.Broadcast(EventType.GameOverBRO, (GameOverDto)value);
+                break;
             default:
                 break;
         }
