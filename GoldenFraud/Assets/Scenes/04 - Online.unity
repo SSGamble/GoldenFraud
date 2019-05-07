@@ -7971,7 +7971,7 @@ RectTransform:
   m_GameObject: {fileID: 1899193927}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0, y: 0, z: 0}
   m_Children:
   - {fileID: 1002971839}
   - {fileID: 1470057241}
@@ -7999,21 +7999,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 43e49038b7d15a9429e18a3c1ec48e98, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  leftPlayer:
-    txtName: {fileID: 0}
-    txtCoin: {fileID: 0}
-    imgWin: {fileID: 0}
-    imgLose: {fileID: 0}
-  rightPlayer:
-    txtName: {fileID: 0}
-    txtCoin: {fileID: 0}
-    imgWin: {fileID: 0}
-    imgLose: {fileID: 0}
-  selfPlayer:
-    txtName: {fileID: 0}
-    txtCoin: {fileID: 0}
-    imgWin: {fileID: 0}
-    imgLose: {fileID: 0}
+  lose1:
+    txtName: {fileID: 784392756}
+    txtCoin: {fileID: 592293428}
+  lose2:
+    txtName: {fileID: 371409657}
+    txtCoin: {fileID: 696152020}
+  win:
+    txtName: {fileID: 1251630330}
+    txtCoin: {fileID: 413125686}
   winClip: {fileID: 0}
   loseClip: {fileID: 0}
 --- !u!82 &1899193930

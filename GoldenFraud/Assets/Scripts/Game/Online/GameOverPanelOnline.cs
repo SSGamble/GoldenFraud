@@ -1,7 +1,9 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
 using Protocol.Code;
+using Protocol.Dto.Fight;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -12,13 +14,11 @@ public class GameOverPanelOnline : MonoBehaviour {
     public class Player {
         public Text txtName;
         public Text txtCoin;
-        public Image imgWin;
-        public Image imgLose;
     }
 
-    public Player leftPlayer;
-    public Player rightPlayer;
-    public Player selfPlayer;
+    public Player lose1;
+    public Player lose2;
+    public Player win;
 
     private Button btnAgain;
     private Button btnHome;
@@ -28,12 +28,30 @@ public class GameOverPanelOnline : MonoBehaviour {
     public AudioClip loseClip;
 
     private void Awake() {
-        EventCenter.AddListener<int, int, int>(EventType.GameOver, GameOver);
+        EventCenter.AddListener<GameOverDto>(EventType.GameOverBRO, GameOverBRO);
         audio = GetComponent<AudioSource>();
         btnAgain = transform.Find("btnAgain").GetComponent<Button>();
         btnAgain.onClick.AddListener(OnAgainBtnClick);
         btnHome = transform.Find("btnHome").GetComponent<Button>();
         btnHome.onClick.AddListener(OnHomeBtnClick);
+    }
+
+    private void OnDestroy() {
+        EventCenter.RemoveListener<GameOverDto>(EventType.GameOverBRO, GameOverBRO); // 重新加载当前场景
+    }
+
+    private void GameOverBRO(GameOverDto dto) {
+
+        transform.DOScale(Vector3.one, 0.3f);
+
+        win.txtName.text = dto.winDto.name;
+        win.txtCoin.text = dto.winCount.ToString();
+
+        lose1.txtName.text = dto.loseDtoList[0].name;
+        lose1.txtCoin.text = (-dto.loseDtoList[0].stakesSum).ToString();
+
+        lose2.txtName.text = dto.loseDtoList[1].name;
+        lose2.txtCoin.text = (-dto.loseDtoList[1].stakesSum).ToString();
     }
 
     /// <summary>
@@ -50,60 +68,4 @@ public class GameOverPanelOnline : MonoBehaviour {
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
-    private void OnDestroy() {
-        EventCenter.RemoveListener<int, int, int>(EventType.GameOver, GameOver); // 重新加载当前场景
-    }
-
-    private void GameOver(int leftCoin, int selfCoin, int rightCoin) {
-        transform.DOScale(Vector3.one, 0.3f);
-
-        leftPlayer.imgLose.gameObject.SetActive(false);
-        leftPlayer.imgWin.gameObject.SetActive(false);
-        selfPlayer.imgLose.gameObject.SetActive(false);
-        selfPlayer.imgWin.gameObject.SetActive(false);
-        rightPlayer.imgLose.gameObject.SetActive(false);
-        rightPlayer.imgWin.gameObject.SetActive(false);
-
-        // 左边输
-        if (leftCoin < 0) {
-            leftPlayer.imgLose.gameObject.SetActive(true);
-            leftPlayer.txtCoin.text = leftCoin.ToString();
-        }
-        // 左边赢
-        else {
-            leftPlayer.imgWin.gameObject.SetActive(true);
-            leftPlayer.txtCoin.text = (Mathf.Abs(selfCoin + rightCoin) + leftCoin).ToString();
-        }
-        // 自身输
-        if (selfCoin < 0) {
-            audio.clip = loseClip;
-            audio.Play();
-            if (NetMsgCenter.Instance != null) {
-                NetMsgCenter.Instance.SendMsg(OpCode.Account, AccountCode.UpdateCoin_CREQ, -selfCoin);
-            }
-            selfPlayer.imgLose.gameObject.SetActive(true);
-            selfPlayer.txtCoin.text = selfCoin.ToString();
-        }
-        // 自身赢
-        else {
-            audio.clip = winClip;
-            audio.Play();
-            int winCoin = Mathf.Abs(leftCoin + rightCoin) + selfCoin;
-            if (NetMsgCenter.Instance != null) {
-                NetMsgCenter.Instance.SendMsg(OpCode.Account, AccountCode.UpdateCoin_CREQ, winCoin);
-            }
-            selfPlayer.imgWin.gameObject.SetActive(true);
-            selfPlayer.txtCoin.text = winCoin.ToString();
-        }
-        // 右边输
-        if (rightCoin < 0) {
-            rightPlayer.imgLose.gameObject.SetActive(true);
-            rightPlayer.txtCoin.text = rightCoin.ToString();
-        }
-        // 右边赢
-        else {
-            rightPlayer.imgWin.gameObject.SetActive(true);
-            rightPlayer.txtCoin.text = (Mathf.Abs(leftCoin + selfCoin) + rightCoin).ToString();
-        }
-    }
 }
